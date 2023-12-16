@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class GuiLocator
 {
@@ -53,23 +54,42 @@ public class GuiLocator
 
     public static int[] locate(BufferedImage toLocateFrom, BufferedImage toFind)
     {
-        int[] pos = null;
+        AtomicReference<Holder> pos = new AtomicReference<>(new Holder());
 
         for (int x = 0; x < toLocateFrom.getWidth() - toFind.getWidth(); x++)
         {
-            for (int y = 0; y < toLocateFrom.getHeight() - toFind.getHeight(); y++)
-            {
-                BufferedImage subImage = toLocateFrom.getSubimage(x, y, toFind.getWidth(), toFind.getHeight());
+            int finalX = x;
 
-                if (isEqual(subImage, toFind))
+            Threads.addThread(() ->
+            {
+                for (int y = 0; y < toLocateFrom.getHeight() - toFind.getHeight(); y++)
                 {
-                    pos = new int[]{x + (toFind.getWidth() / 2), y + (toFind.getHeight() / 2)};
-                    break;
+                    BufferedImage subImage = toLocateFrom.getSubimage(finalX, y, toFind.getWidth(), toFind.getHeight());
+
+                    if (isEqual(subImage, toFind))
+                    {
+                        pos.get().set(new int[]{finalX + (toFind.getWidth() / 2), y + (toFind.getHeight() / 2)});
+                        break;
+                    }
                 }
+            });
+        }
+
+        while (!Threads.hasThreadsFinished())
+        {
+            try
+            {
+                ;
+            }
+
+            catch (Exception e)
+            {
+                ;
             }
         }
 
-        return pos;
+        int[] array = pos.get().get();
+        return array.length == 0 ? null : array;
     }
 
     public static int[] locate(File toLocateFrom, File toFind)
@@ -140,9 +160,9 @@ public class GuiLocator
             return false;
         }
 
-        for (int x = 0; x < image1.getWidth(); x++)
+        for (int x = 0; x < image1.getWidth(); x += (image1.getWidth() / 15))
         {
-            for (int y = 0; y < image1.getHeight(); y++)
+            for (int y = 0; y < image1.getHeight(); y += (image1.getHeight() / 15))
             {
                 if (image1.getRGB(x, y) != image2.getRGB(x, y))
                 {
