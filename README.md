@@ -10,3 +10,6 @@ GuiLocator.leftClickAt(image);
 ```
 
 **NOTE**: The image to find must be *pixel-perfect*!
+
+### Library Download
+https://github.com/Appu26J/GuiLocator/releases/download/GuiLocator/guilocator.jar
