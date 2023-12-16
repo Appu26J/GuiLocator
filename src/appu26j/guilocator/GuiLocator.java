@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class GuiLocator
@@ -174,5 +175,55 @@ public class GuiLocator
         }
 
         return true;
+    }
+
+    static class Holder
+    {
+        private int[] array;
+
+        public Holder()
+        {
+            array = new int[]{};
+        }
+
+        public int[] get()
+        {
+            return array;
+        }
+
+        public void set(int[] array)
+        {
+            this.array = array;
+        }
+    }
+
+    static class Threads
+    {
+        private static final ArrayList<Thread> threads = new ArrayList<>();
+
+        public static void addThread(Runnable runnable)
+        {
+            Thread thread = new Thread(runnable);
+            threads.add(thread);
+            thread.start();
+        }
+
+        public static boolean hasThreadsFinished()
+        {
+            boolean done = true;
+
+            for (int i = 0; i < threads.size(); i++)
+            {
+                Thread thread = threads.get(i);
+
+                if (thread.isAlive())
+                {
+                    done = false;
+                    break;
+                }
+            }
+
+            return done;
+        }
     }
 }
