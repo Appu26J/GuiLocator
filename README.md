@@ -8,3 +8,5 @@ This is basically equivalent to Python's pyautogui which has locate, locateOnScr
 int[] image = GuiLocator.locateOnScreen(new File("image.png"));
 GuiLocator.leftClickAt(image);
 ```
+
+**NOTE**: The image to find must be *pixel-perfect*!
