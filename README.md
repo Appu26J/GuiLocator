@@ -6,5 +6,5 @@ This is basically equivalent to Python's pyautogui!
 ### Example Usage
 ```java
 int[] image = GuiLocator.locateOnScreen(new File("image.png"));
-GuiLocator.click(image);
+GuiLocator.leftClickAt(image);
 ```
