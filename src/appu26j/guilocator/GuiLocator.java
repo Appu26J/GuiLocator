@@ -85,7 +85,7 @@ public class GuiLocator
         }
     }
 
-    public static void click(int[] pos)
+    public static void leftClickAt(int[] pos)
     {
         if (pos != null)
         {
@@ -100,6 +100,30 @@ public class GuiLocator
 
                 robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
                 robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+            }
+
+            catch (Exception e)
+            {
+                ;
+            }
+        }
+    }
+
+    public static void rightClickAt(int[] pos)
+    {
+        if (pos != null)
+        {
+            try
+            {
+                int i = 0;
+
+                while ((MouseInfo.getPointerInfo().getLocation().x != pos[0] || MouseInfo.getPointerInfo().getLocation().y != pos[1]) && i++ <= 5)
+                {
+                    robot.mouseMove(pos[0], pos[1]);
+                }
+
+                robot.mousePress(InputEvent.BUTTON2_DOWN_MASK);
+                robot.mouseRelease(InputEvent.BUTTON2_DOWN_MASK);
             }
 
             catch (Exception e)
