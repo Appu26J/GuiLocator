@@ -160,9 +160,11 @@ public class GuiLocator
             return false;
         }
 
-        for (int x = 0; x < image1.getWidth(); x += (image1.getWidth() / 15))
+        int increment = image1.getWidth() / 15;
+
+        for (int x = 0; x < image1.getWidth(); x += increment)
         {
-            for (int y = 0; y < image1.getHeight(); y += (image1.getHeight() / 15))
+            for (int y = 0; y < image1.getHeight(); y += increment)
             {
                 if (image1.getRGB(x, y) != image2.getRGB(x, y))
                 {
