@@ -25,7 +25,7 @@ public class GuiLocator
         }
     }
 
-    public static int[] locateOnScreen(BufferedImage toFind)
+    public static Result locateOnScreen(BufferedImage toFind)
     {
         try
         {
@@ -40,7 +40,22 @@ public class GuiLocator
         }
     }
 
-    public static int[] locateOnScreen(File toFind)
+    public static Result[] locateAllOnScreen(BufferedImage toFind)
+    {
+        try
+        {
+            Rectangle rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+            BufferedImage bufferedImage = robot.createScreenCapture(rectangle);
+            return locateAll(bufferedImage, toFind);
+        }
+
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
+
+    public static Result locateOnScreen(File toFind)
     {
         try
         {
@@ -53,7 +68,20 @@ public class GuiLocator
         }
     }
 
-    public static int[] locate(BufferedImage toLocateFrom, BufferedImage toFind)
+    public static Result[] locateAllOnScreen(File toFind)
+    {
+        try
+        {
+            return locateAllOnScreen(ImageIO.read(toFind));
+        }
+
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
+
+    public static Result locate(BufferedImage toLocateFrom, BufferedImage toFind)
     {
         AtomicReference<Holder> pos = new AtomicReference<>(new Holder());
 
@@ -90,10 +118,53 @@ public class GuiLocator
         }
 
         int[] array = pos.get().get();
-        return array.length == 0 ? null : array;
+        return array.length == 0 ? null : new Result(array);
     }
 
-    public static int[] locate(File toLocateFrom, File toFind)
+    public static Result[] locateAll(BufferedImage toLocateFrom, BufferedImage toFind)
+    {
+        AtomicReference<ArrayList<Result>> pos = new AtomicReference<>(new ArrayList<>());
+
+        for (int x = 0; x < toLocateFrom.getWidth() - toFind.getWidth(); x++)
+        {
+            int finalX = x;
+
+            Threads.addThread(() ->
+            {
+                for (int y = 0; y < toLocateFrom.getHeight() - toFind.getHeight(); y++)
+                {
+                    BufferedImage subImage = toLocateFrom.getSubimage(finalX, y, toFind.getWidth(), toFind.getHeight());
+
+                    if (isEqual(subImage, toFind))
+                    {
+                        Result result = new Result(new int[]{finalX + (toFind.getWidth() / 2), y + (toFind.getHeight() / 2)});
+
+                        if (!pos.get().contains(result))
+                        {
+                            pos.get().add(result);
+                        }
+                    }
+                }
+            });
+        }
+
+        while (!Threads.hasThreadsFinished())
+        {
+            try
+            {
+                ;
+            }
+
+            catch (Exception e)
+            {
+                ;
+            }
+        }
+
+        return pos.get().toArray(new Result[0]);
+    }
+
+    public static Result locate(File toLocateFrom, File toFind)
     {
         try
         {
@@ -106,17 +177,30 @@ public class GuiLocator
         }
     }
 
-    public static void leftClickAt(int[] pos)
+    public static Result[] locateAll(File toLocateFrom, File toFind)
     {
-        if (pos != null)
+        try
+        {
+            return locateAll(ImageIO.read(toLocateFrom), ImageIO.read(toFind));
+        }
+
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
+
+    public static void leftClickAt(Result result)
+    {
+        if (result != null)
         {
             try
             {
                 int i = 0;
 
-                while ((MouseInfo.getPointerInfo().getLocation().x != pos[0] || MouseInfo.getPointerInfo().getLocation().y != pos[1]) && i++ <= 5)
+                while ((MouseInfo.getPointerInfo().getLocation().x != result.getX() || MouseInfo.getPointerInfo().getLocation().y != result.getY()) && i++ <= 5)
                 {
-                    robot.mouseMove(pos[0], pos[1]);
+                    robot.mouseMove(result.getX(), result.getY());
                 }
 
                 robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
@@ -130,17 +214,17 @@ public class GuiLocator
         }
     }
 
-    public static void rightClickAt(int[] pos)
+    public static void rightClickAt(Result result)
     {
-        if (pos != null)
+        if (result != null)
         {
             try
             {
                 int i = 0;
 
-                while ((MouseInfo.getPointerInfo().getLocation().x != pos[0] || MouseInfo.getPointerInfo().getLocation().y != pos[1]) && i++ <= 5)
+                while ((MouseInfo.getPointerInfo().getLocation().x != result.getX() || MouseInfo.getPointerInfo().getLocation().y != result.getY()) && i++ <= 5)
                 {
-                    robot.mouseMove(pos[0], pos[1]);
+                    robot.mouseMove(result.getX(), result.getY());
                 }
 
                 robot.mousePress(InputEvent.BUTTON2_DOWN_MASK);
@@ -177,7 +261,7 @@ public class GuiLocator
         return true;
     }
 
-    static class Holder
+    private static class Holder
     {
         private int[] array;
 
@@ -197,7 +281,7 @@ public class GuiLocator
         }
     }
 
-    static class Threads
+    private static class Threads
     {
         private static final ArrayList<Thread> threads = new ArrayList<>();
 
@@ -224,6 +308,44 @@ public class GuiLocator
             }
 
             return done;
+        }
+    }
+
+    public static class Result
+    {
+        private int[] array;
+
+        public Result(int[] array)
+        {
+            this.array = array;
+        }
+
+        public int getX()
+        {
+            return this.array[0];
+        }
+
+        public int getY()
+        {
+            return this.array[1];
+        }
+
+        @Override
+        public String toString()
+        {
+            return "Result@[" + this.array[0] + ", " + this.array[1] + "]";
+        }
+
+        @Override
+        public boolean equals(Object obj)
+        {
+            if (obj instanceof Result)
+            {
+                Result result = (Result) obj;
+                return result.getX() == this.getX() && result.getY() == this.getY();
+            }
+
+            return super.equals(obj);
         }
     }
 }
