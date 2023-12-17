@@ -51,7 +51,7 @@ public class GuiLocator
 
         catch (Exception e)
         {
-            return null;
+            return new Result[]{};
         }
     }
 
@@ -77,7 +77,7 @@ public class GuiLocator
 
         catch (Exception e)
         {
-            return null;
+            return new Result[]{};
         }
     }
 
@@ -104,7 +104,7 @@ public class GuiLocator
             });
         }
 
-        while (!Threads.hasThreadsFinished())
+        while (!Threads.haveFinished())
         {
             try
             {
@@ -148,7 +148,7 @@ public class GuiLocator
             });
         }
 
-        while (!Threads.hasThreadsFinished())
+        while (!Threads.haveFinished())
         {
             try
             {
@@ -186,7 +186,7 @@ public class GuiLocator
 
         catch (Exception e)
         {
-            return null;
+            return new Result[]{};
         }
     }
 
@@ -214,6 +214,11 @@ public class GuiLocator
         }
     }
 
+    public static void leftClickAt(int[] pos)
+    {
+        leftClickAt(new Result(pos));
+    }
+
     public static void rightClickAt(Result result)
     {
         if (result != null)
@@ -236,6 +241,11 @@ public class GuiLocator
                 ;
             }
         }
+    }
+
+    public static void rightClickAt(int[] pos)
+    {
+        rightClickAt(new Result(pos));
     }
 
     private static boolean isEqual(BufferedImage image1, BufferedImage image2)
@@ -292,7 +302,7 @@ public class GuiLocator
             thread.start();
         }
 
-        public static boolean hasThreadsFinished()
+        public static boolean haveFinished()
         {
             boolean done = true;
 
