@@ -323,7 +323,7 @@ public class GuiLocator
 
     public static class Result
     {
-        private int[] array;
+        private final int[] array;
 
         public Result(int[] array)
         {
@@ -343,7 +343,7 @@ public class GuiLocator
         @Override
         public String toString()
         {
-            return "Result@[" + this.array[0] + ", " + this.array[1] + "]";
+            return "Result@[" + this.getX() + ", " + this.getY() + "]";
         }
 
         @Override
