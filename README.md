@@ -7,6 +7,15 @@ This is basically equivalent to Python's pyautogui which has locate, locateOnScr
 ```java
 Result location = GuiLocator.locateOnScreen(new File("image.png"));
 GuiLocator.leftClickAt(location);
+
+/*
+ * Result[] locations = GuiLocator.locateAllOnScreen(new File("image.png"));
+ * 
+ * for (Result result : locations)
+ * {
+ *     GuiLocator.leftClickAt(result);
+ * }
+ */
 ```
 
 **NOTE**: The image to find must be *pixel-perfect*!
